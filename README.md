@@ -1,2 +1,2 @@
-# The_Chair
-Enumeration of possible tilings of The Chair strongly aperiodic 3D monotile
+# The Chair
+Enumeration of possible configurations of The Decorated Chair, a strongly aperiodic 3D monotile. 

@@ -5,7 +5,7 @@
 #viewer{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center}#box{background:#fff;padding:10px;border-radius:8px;display:flex;gap:12px}
 #big{cursor:grab;background:#fff;border:1px solid #ccc}#side{width:220px;font-size:13px;line-height:1.5}label{display:block}button,select{font:inherit}</style></head><body>
 <div id="top"><b>Chair enumeration</b> rule <select id="rule"></select> set <select id="cat"></select> <span id="count"></span>
-<span style="font-size:12px;color:#555">red = the chair &nbsp; blue = siblings in its superchair &nbsp; grey = other neighbours &nbsp; magenta = mirror image &nbsp; green = forced second layer &nbsp; light green = possible second layer &nbsp; border green/red = legal / fails second layer &nbsp; click a thumbnail to rotate it</span></div>
+<span style="font-size:12px;color:#555">outlines: red = the chair &nbsp; blue = siblings in its superchair &nbsp; grey = other neighbours &nbsp; magenta = mirror image &nbsp; green = forced second layer &nbsp; light green = possible second layer. Border green/red = legal / fails second layer. Faces: black, white, blue. Click a thumbnail to rotate it.</span></div>
 <div id="grid"></div>
 <div id="viewer"><div id="box"><canvas id="big" width="620" height="620"></canvas><div id="side"><div id="info"></div><label><input type="checkbox" id="explode"> explode</label>
 <label><input type="checkbox" id="showShell" checked> show neighbours</label><label><input type="checkbox" id="showForced" checked> show forced second layer</label><label><input type="checkbox" id="showPossible"> show possible second layer</label>
@@ -15,9 +15,9 @@ const DATA={"arrows":{"contacts":[{"t":[[[[1,0,0],[0,1,0],[0,0,1]],[0,0,0],"root
 const mv=(M,v)=>[0,1,2].map(i=>M[i][0]*v[0]+M[i][1]*v[1]+M[i][2]*v[2]);
 const cellsOf=(M,t)=>CELLS.map(c=>mv(M,[2*c[0]+1,2*c[1]+1,2*c[2]+1]).map((x,i)=>(x+2*t[i]-1)/2));
 const facesOf=(M,t)=>FACES.map(([c,n,k,d])=>({ctr:mv(M,[2*c[0]+1+n[0],2*c[1]+1+n[1],2*c[2]+1+n[2]]).map((x,i)=>(x+2*t[i])/2),n:mv(M,n),k,d:mv(M,d)}));
-const ROLE={root:'#c0392b',sib:'#2471a3',other:'#7f8c8d',mirror:'#c71585',forced:'#1e8449',possible:'#a9dfbf'};const FC={B:'#2b2b2b',W:'#ffffff',G:'#9e9e9e'};
+const ROLE={root:'#c0392b',sib:'#2471a3',other:'#7f8c8d',mirror:'#c71585',forced:'#1e8449',possible:'#a9dfbf'};const FC={B:'#2b2b2b',W:'#ffffff',G:'#2a6fb0'};
 function basisOf(n){const i=n.findIndex(x=>x!==0),a=[0,1,2].filter(j=>j!==i);const u=[0,0,0],v=[0,0,0];u[a[0]]=1;v[a[1]]=1;return [u,v];}
-function prep(item){ // precompute tiles: faces, explode direction
+function prep(item){
   const tiles=item.t.map(([M,t,role])=>({faces:facesOf(M,t),role,cen:cellsOf(M,t).reduce((s,c)=>s.map((x,i)=>x+c[i]/7+0.5/7),[0,0,0])}));
   const r0=tiles[0].cen;tiles.forEach(T=>{const d=T.cen.map((x,i)=>x-r0[i]);const L=Math.hypot(...d)||1;T.off=d.map(x=>Math.round(2*x/L)/2);});return tiles;}
 function render(cv,tiles,view,arrows){
@@ -27,7 +27,7 @@ function render(cv,tiles,view,arrows){
   const dot=(p,q)=>p[0]*q[0]+p[1]*q[1]+p[2]*q[2];const cen=[1,1,1];
   const P=p=>[W/2+view.z*dot([p[0]-cen[0],p[1]-cen[1],p[2]-cen[2]],R),H/2-view.z*dot([p[0]-cen[0],p[1]-cen[1],p[2]-cen[2]],U)];
   const polys=[];
-  for(const T of tiles){ if(!view.show(T.role))continue;const off=view.ex?T.off.map(x=>x*1.0):[0,0,0];
+  for(const T of tiles){ if(!view.show(T.role))continue;const off=view.ex?T.off:[0,0,0];
     for(const f of T.faces){ if(dot(f.n,V)<=0)continue;const [u,v]=basisOf(f.n);const c=f.ctr.map((x,i)=>x+off[i]);
       const q=[[-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5]].map(([s,r])=>P(c.map((x,i)=>x+s*u[i]+r*v[i])));
       let arrow=null;if(arrows){const L=Math.hypot(...f.d),d=f.d.map(x=>x/L),ee=[f.n[1]*d[2]-f.n[2]*d[1],f.n[2]*d[0]-f.n[0]*d[2],f.n[0]*d[1]-f.n[1]*d[0]];

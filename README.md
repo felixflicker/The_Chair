@@ -1,5 +1,6 @@
 # The Chair
-Enumeration of possible configurations of The Decorated Chair, a strongly aperiodic 3D monotile. 
+
+Enumeration of possible configurations of Chair44 and Chair611, strongly aperiodic 3D monotiles, to accompany "Matching Rules for a Three-Dimensional Strongly Aperiodic Monotile", https://arxiv.org/abs/2609.23783.
 
 Usage: 
 
